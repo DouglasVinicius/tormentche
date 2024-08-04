@@ -1,4 +1,4 @@
-# TORMENTOR BOT
+# TORMENTCHÊ BOT
 
 Um bot para discord que implementa algumas funcionalidades relacionadas ao RPG **Tormenta 20**, para auxiliar os grupos em suas mesas.
 
@@ -16,6 +16,6 @@ $ pip install -r requirements.txt
 
 ## Comandos
 
-- `!buscar_magia ${nome_da_magia}`
+- `?buscar_magia ${nome_da_magia}`
 
-- `!buscar_condicao ${nome_do_condicao}`
+- `?buscar_condicao ${nome_do_condicao}`
