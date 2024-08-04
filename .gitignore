@@ -1,0 +1,7 @@
+data
+backup-data
+
+.env
+sketches
+
+**/__pycache__
