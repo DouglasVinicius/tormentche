@@ -43,21 +43,36 @@ async def status_autocomplete(interaction: discord.Interaction, current: str):
     return choices
 
 
+async def maneuver_autocomplete(interaction: discord.Interaction, current: str):
+    normalized_current = normalize_names(current)
+    choices = [
+        app_commands.Choice(name=maneuver.get("nome"), value=maneuver.get("nome"))
+        for maneuver in maneuver_json
+        if normalized_current in maneuver.get("normalized_name")
+    ]
+    if len(choices) > MAX_POSSIBLE_CHOICES:
+        return choices[:MAX_POSSIBLE_CHOICES]
+    return choices
+
+
 def pre_run_operations() -> tuple[dict]:
-    global magic_json
-    global status_json
+    global magic_json, status_json, maneuver_json
 
     magic_file = open("data/magias.json")
     status_file = open("data/condicoes.json")
+    maneuver_file = open("data/manobras.json")
 
     magic_json = json.loads(magic_file.read())
     status_json = json.loads(status_file.read())
+    maneuver_json = json.loads(maneuver_file.read())
 
     magic_json = json_names_normalization(magic_json)
     status_json = json_names_normalization(status_json)
+    maneuver_json = json_names_normalization(maneuver_json)
 
     magic_file.close()
     status_file.close()
+    maneuver_file.close()
 
 
 def handler():
@@ -76,7 +91,7 @@ def handler():
         print(f"Logged in as {bot.user.name}")
         await bot.tree.sync()
 
-    @bot.tree.command(name="magia", description="Busque uma magia pelo nome")
+    @bot.tree.command(name="magias", description="Busque uma magia pelo nome")
     @app_commands.describe(magia="Nome da magia desejada")
     @app_commands.autocomplete(magia=magic_autocomplete)
     async def search_magic(interaction: discord.Interaction, *, magia: str):
@@ -102,7 +117,7 @@ def handler():
             else:
                 await interaction.response.send_message(embed=main_embed)
 
-    @bot.tree.command(name="condicao", description="Busque uma condição pelo nome")
+    @bot.tree.command(name="condicoes", description="Busque uma condição pelo nome")
     @app_commands.describe(condicao="Nome da condição desejada")
     @app_commands.autocomplete(condicao=status_autocomplete)
     async def search_status(interaction: discord.Interaction, *, condicao: str):
@@ -130,6 +145,34 @@ def handler():
         else:
             if len(result_match) > 0:
                 buttonsView = CustomButtons(result_match, "status", None)
+                await interaction.response.send_message(
+                    embed=main_embed, view=buttonsView
+                )
+            else:
+                await interaction.response.send_message(embed=main_embed)
+
+    @bot.tree.command(
+        name="manobras", description="Busque uma manobra de combate pelo nome"
+    )
+    @app_commands.describe(manobra="Nome da manobra de combate desejada")
+    @app_commands.autocomplete(manobra=maneuver_autocomplete)
+    async def search_maneuver(interaction: discord.Interaction, *, manobra: str):
+        result_match = get_exact_match(maneuver_json, manobra)
+        exact_match = True
+
+        if not result_match:
+            exact_match = False
+            result_match = get_included_matches(maneuver_json, manobra)
+            if len(result_match) <= 0:
+                result_match = get_top_similarities(maneuver_json, manobra)
+
+        custom_embed = CustomEmbed(result_match, "maneuver")
+        main_embed = custom_embed.create_description_embed()
+        if exact_match:
+            await interaction.response.send_message(embed=main_embed)
+        else:
+            if len(result_match) > 0:
+                buttonsView = CustomButtons(result_match, "maneuver", None)
                 await interaction.response.send_message(
                     embed=main_embed, view=buttonsView
                 )

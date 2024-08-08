@@ -135,7 +135,12 @@ class CustomEmbed:
             case "status":
                 title = "Condição não encontrada"
                 description = "Não foi possível encontrar a condição desejada. \
-                    Abaixo estão algumas outras condição similares que podem ser do seu interesse.\n\
+                    Abaixo estão algumas outras condições similares que podem ser do seu interesse.\n\
+                    Caso encontre a desejada, apenas clique no botão correspondente."
+            case "maneuver":
+                title = "Manobra de combate não encontrada"
+                description = "Não foi possível encontrar a manobra desejada. \
+                    Abaixo estão algumas outras manobras similares que podem ser do seu interesse.\n\
                     Caso encontre a desejada, apenas clique no botão correspondente."
 
         embed = discord.Embed(
@@ -157,6 +162,10 @@ class CustomEmbed:
                 title = "Condição não encontrada"
                 description = "Não foi possível encontrar a condição desejada ou qualquer outra semelhante.\n\
                     Por favor, digite corretamente o nome da condição."
+            case "maneuver":
+                title = "Manobra de combate não encontrada"
+                description = "Não foi possível encontrar a manobra desejada ou qualquer outra semelhante.\n\
+                    Por favor, digite corretamente o nome da manobra."
 
         embed = discord.Embed(
             title=title,
