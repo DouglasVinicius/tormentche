@@ -22,20 +22,25 @@ def handler() -> None:
     intents = discord.Intents().default()
     intents.message_content = True
 
-    bot = commands.Bot(command_prefix="/", intents=intents)
+    bot = commands.Bot(command_prefix="?", intents=intents)
 
     pre_run_tasks = PreRunTasks()
     custom_auto_complete = CustomAutoComplete(pre_run_tasks)
 
     @bot.event
-    async def on_ready():
+    async def on_ready() -> None:
         print(f"Logged in as {bot.user.name}")
+
+    @bot.command()
+    @commands.is_owner()
+    async def sync(ctx: commands.Context) -> None:
         await bot.tree.sync()
+        await ctx.send("Comandos sincronizados com sucesso!")
 
     @bot.tree.command(name="magias", description="Busque uma magia pelo nome")
     @app_commands.describe(magia="Nome da magia desejada")
     @app_commands.autocomplete(magia=custom_auto_complete.magic_autocomplete)
-    async def search_magic(interaction: discord.Interaction, *, magia: str):
+    async def search_magic(interaction: discord.Interaction, *, magia: str) -> None:
         result_match = get_exact_match(pre_run_tasks.magic_json, magia)
         exact_match = True
 
@@ -61,7 +66,7 @@ def handler() -> None:
     @bot.tree.command(name="condicoes", description="Busque uma condição pelo nome")
     @app_commands.describe(condicao="Nome da condição desejada")
     @app_commands.autocomplete(condicao=custom_auto_complete.status_autocomplete)
-    async def search_status(interaction: discord.Interaction, *, condicao: str):
+    async def search_status(interaction: discord.Interaction, *, condicao: str) -> None:
         result_match = get_exact_match(pre_run_tasks.status_json, condicao)
         exact_match = True
 
@@ -99,7 +104,9 @@ def handler() -> None:
     )
     @app_commands.describe(manobra="Nome da manobra de combate desejada")
     @app_commands.autocomplete(manobra=custom_auto_complete.maneuver_autocomplete)
-    async def search_maneuver(interaction: discord.Interaction, *, manobra: str):
+    async def search_maneuver(
+        interaction: discord.Interaction, *, manobra: str
+    ) -> None:
         result_match = get_exact_match(pre_run_tasks.maneuver_json, manobra)
         exact_match = True
 
@@ -127,7 +134,7 @@ def handler() -> None:
     @bot.tree.command(name="parceiros", description="Busque um parceiro pelo nome")
     @app_commands.describe(parceiro="Nome do parceiro desejado")
     @app_commands.autocomplete(parceiro=custom_auto_complete.ally_autocomplete)
-    async def search_ally(interaction: discord.Interaction, *, parceiro: str):
+    async def search_ally(interaction: discord.Interaction, *, parceiro: str) -> None:
         result_match = get_exact_match(pre_run_tasks.ally_json, parceiro)
         exact_match = True
 
