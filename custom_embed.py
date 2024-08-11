@@ -113,6 +113,44 @@ class CustomEmbed:
                 if status_type:
                     embed.add_field(name="Tipo", value=status_type, inline=False)
 
+            case "ally":
+                variant = self.selected_values.get("variante")
+                if variant:
+                    embed.add_field(name="Variante", value=variant, inline=False)
+
+                level = self.selected_values.get("niveis")
+                if level:
+                    beginner = self.selected_values.get("niveis").get("iniciante")
+                    veteran = self.selected_values.get("niveis").get("veterano")
+                    master = self.selected_values.get("niveis").get("mestre")
+
+                    embed.add_field(name="\nNíveis", value="", inline=False)
+                    if beginner:
+                        embed.add_field(
+                            name="Iniciante",
+                            value=beginner,
+                            inline=True,
+                        )
+                    if veteran:
+                        embed.add_field(
+                            name="Veterano",
+                            value=veteran,
+                            inline=True,
+                        )
+                    if master:
+                        embed.add_field(
+                            name="Mestre",
+                            value=master,
+                            inline=True,
+                        )
+                    embed.add_field(name="", value="", inline=False)
+
+                observations = self.selected_values.get("observacoes")
+                if observations:
+                    embed.add_field(
+                        name="*Observações*", value=f"*{observations}*", inline=False
+                    )
+
         for value in INLINE_FIELDS:
             field_value = self.selected_values.get(value.get("key"))
             if field_value:
@@ -142,6 +180,11 @@ class CustomEmbed:
                 description = "Não foi possível encontrar a manobra desejada. \
                     Abaixo estão algumas outras manobras similares que podem ser do seu interesse.\n\
                     Caso encontre a desejada, apenas clique no botão correspondente."
+            case "ally":
+                title = "Parceiro não encontrado"
+                description = "Não foi possível encontrar o parceiro desejado. \
+                    Abaixo estão alguns outros parceiros similares que podem ser do seu interesse.\n\
+                    Caso encontre o desejado, apenas clique no botão correspondente."
 
         embed = discord.Embed(
             title=title,
@@ -166,6 +209,10 @@ class CustomEmbed:
                 title = "Manobra de combate não encontrada"
                 description = "Não foi possível encontrar a manobra desejada ou qualquer outra semelhante.\n\
                     Por favor, digite corretamente o nome da manobra."
+            case "ally":
+                title = "Parceiro não encontrado"
+                description = "Não foi possível encontrar o parceiro desejado ou qualquer outro semelhante.\n\
+                    Por favor, digite corretamente o nome do parceiro."
 
         embed = discord.Embed(
             title=title,
