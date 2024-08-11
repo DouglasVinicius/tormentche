@@ -10,6 +10,7 @@ from utils.utils import (
     get_top_similarities,
 )
 from custom_embed import CustomEmbed
+from help_embed import HelpEmbed
 from custom_buttons import CustomButtons
 from custom_auto_complete import CustomAutoComplete
 from pre_run_tasks import PreRunTasks
@@ -36,6 +37,13 @@ def handler() -> None:
     async def sync(ctx: commands.Context) -> None:
         await bot.tree.sync()
         await ctx.send("Comandos sincronizados com sucesso!")
+
+    @bot.tree.command(
+        name="ajuda", description="Informa os possíveis comandos e suas utilizações"
+    )
+    async def help_command(interaction: discord.Interaction) -> None:
+        help_embed = HelpEmbed()
+        await interaction.response.send_message(embed=help_embed.help_embed)
 
     @bot.tree.command(name="magias", description="Busque uma magia pelo nome")
     @app_commands.describe(magia="Nome da magia desejada")
