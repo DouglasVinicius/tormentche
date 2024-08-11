@@ -25,7 +25,7 @@ class CustomButtons(View):
             button.callback = self.button_callback
             self.add_item(button)
 
-    async def button_callback(self, interation: discord.Interaction):
+    async def button_callback(self, interation: discord.Interaction) -> None:
         response_embed = CustomEmbed(
             self.buttons_infos[int(interation.data["custom_id"])], self.embed_type
         )
@@ -33,7 +33,7 @@ class CustomButtons(View):
             embed=response_embed.create_description_embed()
         )
 
-    def __normalize_input_buttons_infos(self):
+    def __normalize_input_buttons_infos(self) -> None:
         if self.buttons_infos[0].get("index"):
             normalized_buttons_infos = []
             for button_info in self.buttons_infos:
