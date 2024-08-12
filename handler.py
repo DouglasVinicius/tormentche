@@ -13,6 +13,8 @@ from custom_embed import CustomEmbed
 from help_embed import HelpEmbed
 from custom_buttons import CustomButtons
 from custom_auto_complete import CustomAutoComplete
+from dice_roll import DiceRoll
+from dice_roll_embed import DiceRollEmbed
 from pre_run_tasks import PreRunTasks
 
 
@@ -39,14 +41,14 @@ def handler() -> None:
         await ctx.send("Comandos sincronizados com sucesso!")
 
     @bot.tree.command(
-        name="ajuda", description="Informa os possíveis comandos e suas utilizações"
+        name="ajuda", description="Informa os possíveis comandos e suas utilizações."
     )
     async def help_command(interaction: discord.Interaction) -> None:
         help_embed = HelpEmbed()
-        await interaction.response.send_message(embed=help_embed.help_embed)
+        await interaction.response.send_message(embed=help_embed.create_help_embed())
 
-    @bot.tree.command(name="magias", description="Busque uma magia pelo nome")
-    @app_commands.describe(magia="Nome da magia desejada")
+    @bot.tree.command(name="magias", description="Busque uma magia pelo nome.")
+    @app_commands.describe(magia="Nome da magia desejada.")
     @app_commands.autocomplete(magia=custom_auto_complete.magic_autocomplete)
     async def search_magic(interaction: discord.Interaction, *, magia: str) -> None:
         result_match = get_exact_match(pre_run_tasks.magic_json, magia)
@@ -71,8 +73,8 @@ def handler() -> None:
             else:
                 await interaction.response.send_message(embed=main_embed)
 
-    @bot.tree.command(name="condicoes", description="Busque uma condição pelo nome")
-    @app_commands.describe(condicao="Nome da condição desejada")
+    @bot.tree.command(name="condicoes", description="Busque uma condição pelo nome.")
+    @app_commands.describe(condicao="Nome da condição desejada.")
     @app_commands.autocomplete(condicao=custom_auto_complete.status_autocomplete)
     async def search_status(interaction: discord.Interaction, *, condicao: str) -> None:
         result_match = get_exact_match(pre_run_tasks.status_json, condicao)
@@ -108,9 +110,9 @@ def handler() -> None:
                 await interaction.response.send_message(embed=main_embed)
 
     @bot.tree.command(
-        name="manobras", description="Busque uma manobra de combate pelo nome"
+        name="manobras", description="Busque uma manobra de combate pelo nome."
     )
-    @app_commands.describe(manobra="Nome da manobra de combate desejada")
+    @app_commands.describe(manobra="Nome da manobra de combate desejada.")
     @app_commands.autocomplete(manobra=custom_auto_complete.maneuver_autocomplete)
     async def search_maneuver(
         interaction: discord.Interaction, *, manobra: str
@@ -139,8 +141,8 @@ def handler() -> None:
             else:
                 await interaction.response.send_message(embed=main_embed)
 
-    @bot.tree.command(name="parceiros", description="Busque um parceiro pelo nome")
-    @app_commands.describe(parceiro="Nome do parceiro desejado")
+    @bot.tree.command(name="parceiros", description="Busque um parceiro pelo nome.")
+    @app_commands.describe(parceiro="Nome do parceiro desejado.")
     @app_commands.autocomplete(parceiro=custom_auto_complete.ally_autocomplete)
     async def search_ally(interaction: discord.Interaction, *, parceiro: str) -> None:
         result_match = get_exact_match(pre_run_tasks.ally_json, parceiro)
@@ -164,6 +166,25 @@ def handler() -> None:
                 )
             else:
                 await interaction.response.send_message(embed=main_embed)
+
+    @bot.tree.command(
+        name="rolar",
+        description="Rola dados e calcula o resultado de expressões matemáticas. Use a sintaxe '{NUM_DADOS}d{NUM_FACES}'.",
+    )
+    @app_commands.describe(
+        expressao="A expressão matemática que inclui a rolagem de dados e/ou operações matemáticas."
+    )
+    async def roll_dice(interaction: discord.Interaction, *, expressao: str) -> None:
+        dice_roll = DiceRoll()
+        normalized_expression, resolved_expression, roll_result = dice_roll.make_roll(
+            expressao
+        )
+        dice_roll_embed = DiceRollEmbed()
+        await interaction.response.send_message(
+            embed=dice_roll_embed.create_dice_roll_embed(
+                normalized_expression, resolved_expression, roll_result
+            )
+        )
 
     bot.run(TOKEN)
 
