@@ -1,9 +1,9 @@
 import discord
 from discord.ui import Button, View
-from custom_embed import CustomEmbed
+from search_info_embed import SearchInfoEmbed
 
 
-class CustomButtons(View):
+class SearchInfoButtons(View):
     def __init__(
         self,
         buttons_infos: list[dict],
@@ -26,7 +26,7 @@ class CustomButtons(View):
             self.add_item(button)
 
     async def button_callback(self, interation: discord.Interaction) -> None:
-        response_embed = CustomEmbed(
+        response_embed = SearchInfoEmbed(
             self.buttons_infos[int(interation.data["custom_id"])], self.embed_type
         )
         await interation.response.send_message(

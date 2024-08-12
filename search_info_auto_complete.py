@@ -5,7 +5,7 @@ from utils.utils import normalize_names
 from pre_run_tasks import PreRunTasks
 
 
-class CustomAutoComplete:
+class SearchInfoAutoComplete:
     MAX_POSSIBLE_CHOICES = 25
 
     def __init__(self, pre_run_tasks: PreRunTasks) -> None:

@@ -3,7 +3,7 @@ import datetime
 import builtins
 
 
-class CustomEmbed:
+class SearchInfoEmbed:
     def __init__(self, selected_values: dict | list[dict], embed_type: str) -> None:
         self.selected_values = selected_values
         self.embed_type = embed_type
