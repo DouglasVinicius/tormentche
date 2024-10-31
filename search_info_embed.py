@@ -33,6 +33,7 @@ class SearchInfoEmbed:
         INLINE_FIELDS = [
             {"key": "resistencia", "name": "Resistência"},
             {"key": "alvo", "name": "Alvo"},
+            {"key": "alvos", "name": "Alvos"},
             {"key": "area", "name": "Área"},
             {"key": "efeito", "name": "Efeito"},
             {"key": "alvo_ou_area", "name": "Alvo ou Área"},
@@ -116,7 +117,10 @@ class SearchInfoEmbed:
             case "ally":
                 variant = self.selected_values.get("variante")
                 if variant:
-                    embed.add_field(name="Variante", value=variant, inline=False)
+                    embed.add_field(name="Variante", value=variant, inline=True)
+                size = self.selected_values.get("tamanho")
+                if size:
+                    embed.add_field(name="Tamanho", value=size, inline=True)
 
                 level = self.selected_values.get("niveis")
                 if level:
