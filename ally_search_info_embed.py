@@ -21,14 +21,14 @@ class AllySearchInfoEmbed(AbstractSearchInfoEmbed):
             timestamp=datetime.datetime.now(),
         )
 
-        variant = self.selected_values.get("variante")
+        variant = self.match_values.get("variante")
         embed.add_field(name="Variante", value=variant, inline=True)
 
-        size = self.selected_values.get("tamanho")
+        size = self.match_values.get("tamanho")
         if size:
             embed.add_field(name="Tamanho", value=size, inline=True)
 
-        level = self.selected_values.get("niveis")
+        level = self.match_values.get("niveis")
         embed.add_field(name="\nNíveis", value="", inline=False)
 
         beginner = level.get("iniciante")
@@ -52,7 +52,7 @@ class AllySearchInfoEmbed(AbstractSearchInfoEmbed):
             inline=True,
         )
 
-        observations = self.selected_values.get("observacoes")
+        observations = self.match_values.get("observacoes")
         if observations:
             embed.add_field(
                 name="*Observações*", value=f"*{observations}*", inline=False
