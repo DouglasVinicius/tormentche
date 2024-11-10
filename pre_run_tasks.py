@@ -1,13 +1,13 @@
 import json
 
-from utils.utils import json_names_normalization
+from utils.utils import name_normalizer
 
 
 class PreRunTasks:
     def __init__(self) -> None:
-        self.pre_run_operations()
+        self.__process_json_files()
 
-    def pre_run_operations(self) -> tuple[dict]:
+    def __process_json_files(self) -> tuple[dict]:
         magic_file = open("data/magias.json")
         status_file = open("data/condicoes.json")
         maneuver_file = open("data/manobras.json")
@@ -18,12 +18,17 @@ class PreRunTasks:
         self.maneuver_json = json.loads(maneuver_file.read())
         self.ally_json = json.loads(ally_file.read())
 
-        self.magic_json = json_names_normalization(self.magic_json)
-        self.status_json = json_names_normalization(self.status_json)
-        self.maneuver_json = json_names_normalization(self.maneuver_json)
-        self.ally_json = json_names_normalization(self.ally_json)
+        self.magic_json = self.__json_names_normalization(self.magic_json)
+        self.status_json = self.__json_names_normalization(self.status_json)
+        self.maneuver_json = self.__json_names_normalization(self.maneuver_json)
+        self.ally_json = self.__json_names_normalization(self.ally_json)
 
         magic_file.close()
         status_file.close()
         maneuver_file.close()
         ally_file.close()
+
+    def __json_names_normalization(self, related_json: list[dict]) -> list:
+        for item in related_json:
+            item["normalized_name"] = name_normalizer(item.get("nome"))
+        return related_json

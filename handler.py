@@ -1,21 +1,54 @@
 import discord
 import os
+import builtins
 
 from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
-from utils.utils import (
-    get_exact_match,
-    get_included_matches,
-    get_top_similarities,
-)
+from abstract_search_info_embed import AbstractSearchInfoEmbed
 from help_embed import HelpEmbed
-from search_info_embed import SearchInfoEmbed
+from status_search_info_embed import StatusSearchInfoEmbed
+from magic_search_info_embed import MagicSearchInfoEmbed
+from maneuver_search_info_embed import ManeuverSearchInfoEmbed
+from ally_search_info_embed import AllySearchInfoEmbed
 from search_info_buttons import SearchInfoButtons
 from search_info_auto_complete import SearchInfoAutoComplete
 from dice_roll import DiceRoll
-from dice_roll_embed import DiceRollEmbed
 from pre_run_tasks import PreRunTasks
+
+
+async def send_search_info_message(
+    interaction: discord.Interaction,
+    search_info_embed: AbstractSearchInfoEmbed,
+    json_data: list[dict],
+    input: str,
+) -> None:
+    match_values = search_info_embed.get_correct_match(input)
+    embeds = search_info_embed.create_embeds(match_values)
+
+    # If it is a list type, it means that is a exact match and have related status (have related status embed)
+    if type(embeds) == builtins.list:
+        related_status_values = [
+            json_data[value.get("index")]
+            for value in match_values.get("condicoes_relacionadas")
+        ]
+        search_info_buttons_view = SearchInfoButtons(
+            related_status_values, search_info_embed
+        )
+
+        await interaction.response.send_message(
+            embeds=embeds, view=search_info_buttons_view
+        )
+    else:
+        if len(match_values) > 0 and type(match_values) == builtins.list:
+            search_info_buttons_view = SearchInfoButtons(
+                match_values, search_info_embed
+            )
+            await interaction.response.send_message(
+                embed=embeds, view=search_info_buttons_view
+            )
+        else:
+            await interaction.response.send_message(embed=embeds)
 
 
 def handler() -> None:
@@ -28,7 +61,12 @@ def handler() -> None:
     bot = commands.Bot(command_prefix="?", intents=intents)
 
     pre_run_tasks = PreRunTasks()
-    search_info_auto_complete = SearchInfoAutoComplete(pre_run_tasks)
+    magic_search_info_auto_complete = SearchInfoAutoComplete(pre_run_tasks.magic_json)
+    status_search_info_auto_complete = SearchInfoAutoComplete(pre_run_tasks.status_json)
+    maneuver_search_info_auto_complete = SearchInfoAutoComplete(
+        pre_run_tasks.maneuver_json
+    )
+    ally_search_info_auto_complete = SearchInfoAutoComplete(pre_run_tasks.ally_json)
 
     @bot.event
     async def on_ready() -> None:
@@ -49,129 +87,48 @@ def handler() -> None:
 
     @bot.tree.command(name="magias", description="Busque uma magia pelo nome.")
     @app_commands.describe(magia="Nome da magia desejada.")
-    @app_commands.autocomplete(magia=search_info_auto_complete.magic_autocomplete)
+    @app_commands.autocomplete(magia=magic_search_info_auto_complete.autocomplete)
     async def search_magic(interaction: discord.Interaction, *, magia: str) -> None:
-        result_match = get_exact_match(pre_run_tasks.magic_json, magia)
-        exact_match = True
-
-        if not result_match:
-            exact_match = False
-            result_match = get_included_matches(pre_run_tasks.magic_json, magia)
-            if len(result_match) <= 0:
-                result_match = get_top_similarities(pre_run_tasks.magic_json, magia)
-
-        search_info_embed = SearchInfoEmbed(result_match, "magic")
-        main_embed = search_info_embed.create_description_embed()
-        if exact_match:
-            await interaction.response.send_message(embed=main_embed)
-        else:
-            if len(result_match) > 0:
-                search_info_buttons_view = SearchInfoButtons(
-                    result_match, "magic", None
-                )
-                await interaction.response.send_message(
-                    embed=main_embed, view=search_info_buttons_view
-                )
-            else:
-                await interaction.response.send_message(embed=main_embed)
+        magic_search_info_embed = MagicSearchInfoEmbed(pre_run_tasks.magic_json)
+        await send_search_info_message(
+            interaction, magic_search_info_embed, pre_run_tasks.magic_json, magia
+        )
 
     @bot.tree.command(name="condicoes", description="Busque uma condição pelo nome.")
     @app_commands.describe(condicao="Nome da condição desejada.")
-    @app_commands.autocomplete(condicao=search_info_auto_complete.status_autocomplete)
+    @app_commands.autocomplete(condicao=status_search_info_auto_complete.autocomplete)
     async def search_status(interaction: discord.Interaction, *, condicao: str) -> None:
-        result_match = get_exact_match(pre_run_tasks.status_json, condicao)
-        exact_match = True
-
-        if not result_match:
-            exact_match = False
-            result_match = get_included_matches(pre_run_tasks.status_json, condicao)
-            if len(result_match) <= 0:
-                result_match = get_top_similarities(pre_run_tasks.status_json, condicao)
-
-        search_info_embed = SearchInfoEmbed(result_match, "status")
-        main_embed = search_info_embed.create_description_embed()
-        if exact_match:
-            related_status = result_match.get("condicoes_relacionadas")
-            if related_status:
-                related_embed = search_info_embed.create_related_items_embed()
-                search_info_buttons_view = SearchInfoButtons(
-                    related_status, "status", pre_run_tasks.status_json
-                )
-                await interaction.response.send_message(
-                    embeds=[main_embed, related_embed], view=search_info_buttons_view
-                )
-            else:
-                await interaction.response.send_message(embed=main_embed)
-        else:
-            if len(result_match) > 0:
-                search_info_buttons_view = SearchInfoButtons(
-                    result_match, "status", None
-                )
-                await interaction.response.send_message(
-                    embed=main_embed, view=search_info_buttons_view
-                )
-            else:
-                await interaction.response.send_message(embed=main_embed)
+        status_search_info_embed = StatusSearchInfoEmbed(pre_run_tasks.status_json)
+        await send_search_info_message(
+            interaction, status_search_info_embed, pre_run_tasks.status_json, condicao
+        )
 
     @bot.tree.command(
         name="manobras", description="Busque uma manobra de combate pelo nome."
     )
     @app_commands.describe(manobra="Nome da manobra de combate desejada.")
-    @app_commands.autocomplete(manobra=search_info_auto_complete.maneuver_autocomplete)
+    @app_commands.autocomplete(manobra=maneuver_search_info_auto_complete.autocomplete)
     async def search_maneuver(
         interaction: discord.Interaction, *, manobra: str
     ) -> None:
-        result_match = get_exact_match(pre_run_tasks.maneuver_json, manobra)
-        exact_match = True
-
-        if not result_match:
-            exact_match = False
-            result_match = get_included_matches(pre_run_tasks.maneuver_json, manobra)
-            if len(result_match) <= 0:
-                result_match = get_top_similarities(
-                    pre_run_tasks.maneuver_json, manobra
-                )
-
-        search_info_embed = SearchInfoEmbed(result_match, "maneuver")
-        main_embed = search_info_embed.create_description_embed()
-        if exact_match:
-            await interaction.response.send_message(embed=main_embed)
-        else:
-            if len(result_match) > 0:
-                search_info_buttons_view = SearchInfoButtons(
-                    result_match, "maneuver", None
-                )
-                await interaction.response.send_message(
-                    embed=main_embed, view=search_info_buttons_view
-                )
-            else:
-                await interaction.response.send_message(embed=main_embed)
+        maneuver_search_info_embed = ManeuverSearchInfoEmbed(
+            pre_run_tasks.maneuver_json
+        )
+        await send_search_info_message(
+            interaction,
+            maneuver_search_info_embed,
+            pre_run_tasks.maneuver_json,
+            manobra,
+        )
 
     @bot.tree.command(name="parceiros", description="Busque um parceiro pelo nome.")
     @app_commands.describe(parceiro="Nome do parceiro desejado.")
-    @app_commands.autocomplete(parceiro=search_info_auto_complete.ally_autocomplete)
+    @app_commands.autocomplete(parceiro=ally_search_info_auto_complete.autocomplete)
     async def search_ally(interaction: discord.Interaction, *, parceiro: str) -> None:
-        result_match = get_exact_match(pre_run_tasks.ally_json, parceiro)
-        exact_match = True
-
-        if not result_match:
-            exact_match = False
-            result_match = get_included_matches(pre_run_tasks.ally_json, parceiro)
-            if len(result_match) <= 0:
-                result_match = get_top_similarities(pre_run_tasks.ally_json, parceiro)
-
-        search_info_embed = SearchInfoEmbed(result_match, "ally")
-        main_embed = search_info_embed.create_description_embed()
-        if exact_match:
-            await interaction.response.send_message(embed=main_embed)
-        else:
-            if len(result_match) > 0:
-                search_info_buttons_view = SearchInfoButtons(result_match, "ally", None)
-                await interaction.response.send_message(
-                    embed=main_embed, view=search_info_buttons_view
-                )
-            else:
-                await interaction.response.send_message(embed=main_embed)
+        ally_search_info_embed = AllySearchInfoEmbed(pre_run_tasks.ally_json)
+        await send_search_info_message(
+            interaction, ally_search_info_embed, pre_run_tasks.ally_json, parceiro
+        )
 
     @bot.tree.command(
         name="rolar",
@@ -185,12 +142,11 @@ def handler() -> None:
         normalized_expression, resolved_expression, roll_result = dice_roll.make_roll(
             expressao
         )
-        dice_roll_embed = DiceRollEmbed()
-        await interaction.response.send_message(
-            embed=dice_roll_embed.create_dice_roll_embed(
-                normalized_expression, resolved_expression, roll_result
-            )
+
+        embed = dice_roll.create_embed(
+            normalized_expression, resolved_expression, roll_result
         )
+        await interaction.response.send_message(embed=embed)
 
     bot.run(TOKEN)
 

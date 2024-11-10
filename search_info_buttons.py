@@ -1,24 +1,21 @@
 import discord
+import builtins
+
 from discord.ui import Button, View
-from search_info_embed import SearchInfoEmbed
+from abstract_search_info_embed import AbstractSearchInfoEmbed
 
 
 class SearchInfoButtons(View):
     def __init__(
-        self,
-        buttons_infos: list[dict],
-        embed_type: str,
-        related_json: list[dict] | None,
+        self, buttons_values: list[dict], search_info_embed: AbstractSearchInfoEmbed
     ) -> None:
         super().__init__()
-        self.related_json = related_json
-        self.embed_type = embed_type
-        self.buttons_infos = buttons_infos
-        self.__normalize_input_buttons_infos()
+        self.buttons_values = buttons_values
+        self.search_info_embed = search_info_embed
 
-        for index, button_info in enumerate(self.buttons_infos):
+        for index, value in enumerate(self.buttons_values):
             button = Button(
-                label=button_info.get("nome"),
+                label=value.get("nome"),
                 custom_id=str(index),
                 style=discord.ButtonStyle.danger,
             )
@@ -26,18 +23,11 @@ class SearchInfoButtons(View):
             self.add_item(button)
 
     async def button_callback(self, interation: discord.Interaction) -> None:
-        response_embed = SearchInfoEmbed(
-            self.buttons_infos[int(interation.data["custom_id"])], self.embed_type
-        )
-        await interation.response.send_message(
-            embed=response_embed.create_description_embed()
+        embed = self.search_info_embed.create_embeds(
+            self.buttons_values[int(interation.data["custom_id"])]
         )
 
-    def __normalize_input_buttons_infos(self) -> None:
-        if self.buttons_infos[0].get("index"):
-            normalized_buttons_infos = []
-            for button_info in self.buttons_infos:
-                normalized_buttons_infos.append(
-                    self.related_json[button_info.get("index")]
-                )
-            self.buttons_infos = normalized_buttons_infos
+        # Avoid get related status recursion
+        if type(embed) == builtins.list:
+            embed = embed[0]
+        await interation.response.send_message(embed=embed)
