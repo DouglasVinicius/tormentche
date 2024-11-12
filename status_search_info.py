@@ -3,13 +3,10 @@ import datetime
 import builtins
 
 from typing import Literal
-from abstract_search_info_embed import AbstractSearchInfoEmbed
+from abstract_search_info import AbstractSearchInfo
 
 
-class StatusSearchInfoEmbed(AbstractSearchInfoEmbed):
-    def __init__(self, json_data: list[dict]) -> None:
-        super().__init__(json_data)
-
+class StatusSearchInfo(AbstractSearchInfo):
     def create_embeds(
         self, match_values: dict | list[dict]
     ) -> list[discord.Embed] | discord.Embed:

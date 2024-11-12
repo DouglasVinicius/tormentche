@@ -2,16 +2,16 @@ import discord
 import builtins
 
 from discord.ui import Button, View
-from abstract_search_info_embed import AbstractSearchInfoEmbed
+from abstract_search_info import AbstractSearchInfo
 
 
 class SearchInfoButtons(View):
     def __init__(
-        self, buttons_values: list[dict], search_info_embed: AbstractSearchInfoEmbed
+        self, buttons_values: list[dict], search_info: AbstractSearchInfo
     ) -> None:
         super().__init__()
         self.buttons_values = buttons_values
-        self.search_info_embed = search_info_embed
+        self.search_info = search_info
 
         for index, value in enumerate(self.buttons_values):
             button = Button(
@@ -23,7 +23,7 @@ class SearchInfoButtons(View):
             self.add_item(button)
 
     async def button_callback(self, interation: discord.Interaction) -> None:
-        embed = self.search_info_embed.create_embeds(
+        embed = self.search_info.create_embeds(
             self.buttons_values[int(interation.data["custom_id"])]
         )
 

@@ -5,12 +5,12 @@ import builtins
 from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
-from abstract_search_info_embed import AbstractSearchInfoEmbed
+from abstract_search_info import AbstractSearchInfo
 from help_embed import HelpEmbed
-from status_search_info_embed import StatusSearchInfoEmbed
-from magic_search_info_embed import MagicSearchInfoEmbed
-from maneuver_search_info_embed import ManeuverSearchInfoEmbed
-from ally_search_info_embed import AllySearchInfoEmbed
+from status_search_info import StatusSearchInfo
+from magic_search_info import MagicSearchInfo
+from maneuver_search_info import ManeuverSearchInfo
+from ally_search_info import AllySearchInfo
 from search_info_buttons import SearchInfoButtons
 from search_info_auto_complete import SearchInfoAutoComplete
 from dice_roll import DiceRoll
@@ -19,12 +19,12 @@ from pre_run_tasks import PreRunTasks
 
 async def send_search_info_message(
     interaction: discord.Interaction,
-    search_info_embed: AbstractSearchInfoEmbed,
+    search_info: AbstractSearchInfo,
     json_data: list[dict],
     input: str,
 ) -> None:
-    match_values = search_info_embed.get_correct_match(input)
-    embeds = search_info_embed.create_embeds(match_values)
+    match_values = search_info.get_correct_match(input)
+    embeds = search_info.create_embeds(match_values)
 
     # If it is a list type, it means that is a exact match and have related status (have related status embed)
     if type(embeds) == builtins.list:
@@ -32,18 +32,14 @@ async def send_search_info_message(
             json_data[value.get("index")]
             for value in match_values.get("condicoes_relacionadas")
         ]
-        search_info_buttons_view = SearchInfoButtons(
-            related_status_values, search_info_embed
-        )
+        search_info_buttons_view = SearchInfoButtons(related_status_values, search_info)
 
         await interaction.response.send_message(
             embeds=embeds, view=search_info_buttons_view
         )
     else:
         if len(match_values) > 0 and type(match_values) == builtins.list:
-            search_info_buttons_view = SearchInfoButtons(
-                match_values, search_info_embed
-            )
+            search_info_buttons_view = SearchInfoButtons(match_values, search_info)
             await interaction.response.send_message(
                 embed=embeds, view=search_info_buttons_view
             )
@@ -89,18 +85,18 @@ def handler() -> None:
     @app_commands.describe(magia="Nome da magia desejada.")
     @app_commands.autocomplete(magia=magic_search_info_auto_complete.autocomplete)
     async def search_magic(interaction: discord.Interaction, *, magia: str) -> None:
-        magic_search_info_embed = MagicSearchInfoEmbed(pre_run_tasks.magic_json)
+        magic_search_info = MagicSearchInfo(pre_run_tasks.magic_json)
         await send_search_info_message(
-            interaction, magic_search_info_embed, pre_run_tasks.magic_json, magia
+            interaction, magic_search_info, pre_run_tasks.magic_json, magia
         )
 
     @bot.tree.command(name="condicoes", description="Busque uma condição pelo nome.")
     @app_commands.describe(condicao="Nome da condição desejada.")
     @app_commands.autocomplete(condicao=status_search_info_auto_complete.autocomplete)
     async def search_status(interaction: discord.Interaction, *, condicao: str) -> None:
-        status_search_info_embed = StatusSearchInfoEmbed(pre_run_tasks.status_json)
+        status_search_info = StatusSearchInfo(pre_run_tasks.status_json)
         await send_search_info_message(
-            interaction, status_search_info_embed, pre_run_tasks.status_json, condicao
+            interaction, status_search_info, pre_run_tasks.status_json, condicao
         )
 
     @bot.tree.command(
@@ -111,12 +107,10 @@ def handler() -> None:
     async def search_maneuver(
         interaction: discord.Interaction, *, manobra: str
     ) -> None:
-        maneuver_search_info_embed = ManeuverSearchInfoEmbed(
-            pre_run_tasks.maneuver_json
-        )
+        maneuver_search_info = ManeuverSearchInfo(pre_run_tasks.maneuver_json)
         await send_search_info_message(
             interaction,
-            maneuver_search_info_embed,
+            maneuver_search_info,
             pre_run_tasks.maneuver_json,
             manobra,
         )
@@ -125,9 +119,9 @@ def handler() -> None:
     @app_commands.describe(parceiro="Nome do parceiro desejado.")
     @app_commands.autocomplete(parceiro=ally_search_info_auto_complete.autocomplete)
     async def search_ally(interaction: discord.Interaction, *, parceiro: str) -> None:
-        ally_search_info_embed = AllySearchInfoEmbed(pre_run_tasks.ally_json)
+        ally_search_info = AllySearchInfo(pre_run_tasks.ally_json)
         await send_search_info_message(
-            interaction, ally_search_info_embed, pre_run_tasks.ally_json, parceiro
+            interaction, ally_search_info, pre_run_tasks.ally_json, parceiro
         )
 
     @bot.tree.command(

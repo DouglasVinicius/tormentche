@@ -11,7 +11,7 @@ MAX_SUGGESTION_ITEMS = 5
 SIMILARITY_FLOOR_VALUE = 0.6
 
 
-class AbstractSearchInfoEmbed(ABC):
+class AbstractSearchInfo(ABC):
     def __init__(self, json_data: list[dict]) -> None:
         self.json_data = json_data
 

@@ -1,13 +1,10 @@
 import discord
 import datetime
 
-from abstract_search_info_embed import AbstractSearchInfoEmbed
+from abstract_search_info import AbstractSearchInfo
 
 
-class AllySearchInfoEmbed(AbstractSearchInfoEmbed):
-    def __init__(self, json_data: list[dict]) -> None:
-        super().__init__(json_data)
-
+class AllySearchInfo(AbstractSearchInfo):
     def create_embeds(
         self, match_values: dict | list[dict]
     ) -> list[discord.Embed] | discord.Embed:
