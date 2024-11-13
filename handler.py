@@ -6,6 +6,7 @@ from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
 from abstract_search_info import AbstractSearchInfo
+from abstract_item_roll import AbstractItemRoll
 from help_embed import HelpEmbed
 from status_search_info import StatusSearchInfo
 from magic_search_info import MagicSearchInfo
@@ -14,6 +15,7 @@ from ally_search_info import AllySearchInfo
 from search_info_buttons import SearchInfoButtons
 from search_info_auto_complete import SearchInfoAutoComplete
 from dice_roll import DiceRoll
+from potion_item_roll import PotionItemRoll
 from pre_run_tasks import PreRunTasks
 
 
@@ -45,6 +47,21 @@ async def send_search_info_message(
             )
         else:
             await interaction.response.send_message(embed=embeds)
+
+
+async def send_item_roll_message(
+    interaction: discord.Interaction,
+    item_roll: AbstractItemRoll,
+    number_of_rolls: int,
+) -> None:
+    rolled_items = item_roll.make_roll(number_of_rolls)
+    embeds = item_roll.create_embeds(rolled_items)
+
+    # If it is a list type, it means that it has related items (have related items embed)
+    if type(embeds) == builtins.list:
+        await interaction.response.send_message(embeds=embeds)
+    else:
+        await interaction.response.send_message(embed=embeds)
 
 
 def handler() -> None:
@@ -141,6 +158,18 @@ def handler() -> None:
             normalized_expression, resolved_expression, roll_result
         )
         await interaction.response.send_message(embed=embed)
+
+    @bot.tree.command(
+        name="pocoes", description="Rola poções utilizando a tabela de poções."
+    )
+    @app_commands.describe(
+        numero_de_pocoes="Número de poções a serem roladas, 1 por padrão."
+    )
+    async def roll_potion(
+        interaction: discord.Interaction, *, numero_de_pocoes: int
+    ) -> None:
+        potion_item_roll = PotionItemRoll(pre_run_tasks.potion_json)
+        await send_item_roll_message(interaction, potion_item_roll, numero_de_pocoes)
 
     bot.run(TOKEN)
 

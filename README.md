@@ -42,8 +42,14 @@ Atualmente os seguintes comandos estão disponíveis para uso.
   - Descrição: Procura e exibe a descrição do parceiro mencionado. Digite o nome do parceiro para obter a descrição correspondente.
 
 - Comandos de rolagem de dados
+
   - Nome: _/rolar ${expressão}_
   - Descrição: Rola dados e calcula o resultado de expressões matemáticas. Use a sintaxe 'XdY', onde 'X' é o número de dados e 'Y' o número de faces. Você pode combinar múltiplos lançamentos e operações matemáticas.
+
+- Comandos de rolagem de itens
+
+  - Nome: _/pocoes ${numero_de_pocoes}_
+  - Descrição: Rola um número X de poções utilizando a tabela de poções. Por padrão, caso o numero desejado de poções passado seja menor que 1, 1 poção é rolada.
 
 ## O que está faltando?
 

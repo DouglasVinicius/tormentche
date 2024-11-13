@@ -35,5 +35,10 @@ class HelpEmbed:
             value="Rola dados e calcula o resultado de expressões matemáticas. Use a sintaxe 'XdY', onde 'X' é o número de dados e 'Y' o número de faces. Você pode combinar múltiplos lançamentos e operações matemáticas.",
             inline=False,
         )
+        help_embed.add_field(
+            name="/pocoes",
+            value="Rola um número X de poções utilizando a tabela de poções. Por padrão, caso o numero desejado de poções passado seja menor que 1, 1 poção é rolada.",
+            inline=False,
+        )
 
         return help_embed
