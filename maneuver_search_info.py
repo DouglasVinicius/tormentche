@@ -5,11 +5,6 @@ from abstract_search_info import AbstractSearchInfo
 
 
 class ManeuverSearchInfo(AbstractSearchInfo):
-    def create_embeds(
-        self, match_values: dict | list[dict]
-    ) -> list[discord.Embed] | discord.Embed:
-        return super().create_embeds(match_values)
-
     def _create_exact_embed(self) -> discord.Embed:
         embed = discord.Embed(
             title=self.match_values.get("nome"),

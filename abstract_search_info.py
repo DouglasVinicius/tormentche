@@ -70,7 +70,6 @@ class AbstractSearchInfo(ABC):
             top_similarities.sort(key=lambda item: item.get("similarity"), reverse=True)
         return [similarity.get("value") for similarity in top_similarities]
 
-    @abstractmethod
     def create_embeds(
         self, match_values: dict | list[dict]
     ) -> list[discord.Embed] | discord.Embed:

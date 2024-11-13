@@ -6,11 +6,6 @@ from abstract_search_info import AbstractSearchInfo
 
 
 class MagicSearchInfo(AbstractSearchInfo):
-    def create_embeds(
-        self, match_values: dict | list[dict]
-    ) -> list[discord.Embed] | discord.Embed:
-        return super().create_embeds(match_values)
-
     def _create_exact_embed(self) -> discord.Embed:
         INLINE_FIELDS = [
             {"key": "resistencia", "name": "Resistência"},
