@@ -51,6 +51,9 @@ Atualmente os seguintes comandos estão disponíveis para uso.
   - Nome: _/pocoes ${numero_de_pocoes}_
   - Descrição: Rola um número X de poções utilizando a tabela de poções. Por padrão, caso o numero desejado de poções passado seja menor que 1, 1 poção é rolada.
 
+  - Nome: _/baralho-do-caos ${numero_de_cartas}_
+  - Descrição: Sorteia de 1 a 4 cartas do artefato Baralho do Caos, seguindo a sua tabela. Caso o numero desejado de cartas seja menor que 1 ou maior que 4, é rolado o valor mínimo ou máximo possível para cada um desses casos respectivamente.
+
 ## O que está faltando?
 
 O bot Tormentche é um trabalho em progresso e por isso ainda não conta com algumas funcionalidades desejadas.
@@ -58,7 +61,5 @@ O bot Tormentche é um trabalho em progresso e por isso ainda não conta com alg
 - Rolagem de tesouros da aba de recompensas do livro.
 
 - Rolagem de tabelas de itens, como acessórios, armaduras, armas entre outros.
-
-- Suporte a rolagem do Baralho do Caos.
 
 - Suporte as buscas de poderes e habilidades.

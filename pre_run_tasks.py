@@ -13,12 +13,14 @@ class PreRunTasks:
         maneuver_file = open("data/manobras.json")
         ally_file = open("data/parceiros.json")
         potion_file = open("data/pocoes.json")
+        chaos_deck_file = open("data/baralho_caos.json")
 
         self.magic_json = json.loads(magic_file.read())
         self.status_json = json.loads(status_file.read())
         self.maneuver_json = json.loads(maneuver_file.read())
         self.ally_json = json.loads(ally_file.read())
         self.potion_json = json.loads(potion_file.read())
+        self.chaos_deck_json = json.loads(chaos_deck_file.read())
 
         self.magic_json = self.__json_names_normalization(self.magic_json)
         self.status_json = self.__json_names_normalization(self.status_json)
@@ -30,6 +32,7 @@ class PreRunTasks:
         maneuver_file.close()
         ally_file.close()
         potion_file.close()
+        chaos_deck_file.close()
 
     def __json_names_normalization(self, related_json: list[dict]) -> list:
         for item in related_json:

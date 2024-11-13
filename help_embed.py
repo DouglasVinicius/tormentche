@@ -40,5 +40,10 @@ class HelpEmbed:
             value="Rola um número X de poções utilizando a tabela de poções. Por padrão, caso o numero desejado de poções passado seja menor que 1, 1 poção é rolada.",
             inline=False,
         )
+        help_embed.add_field(
+            name="/baralho-do-caos",
+            value="Sorteia de 1 a 4 cartas do artefato Baralho do Caos, seguindo a sua tabela. Caso o numero desejado de cartas seja menor que 1 ou maior que 4, é rolado o valor mínimo ou máximo possível para cada um desses casos respectivamente.",
+            inline=False,
+        )
 
         return help_embed

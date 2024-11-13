@@ -15,6 +15,7 @@ from ally_search_info import AllySearchInfo
 from search_info_buttons import SearchInfoButtons
 from search_info_auto_complete import SearchInfoAutoComplete
 from dice_roll import DiceRoll
+from chaos_deck_item_roll import ChaosDeckItemRoll
 from potion_item_roll import PotionItemRoll
 from pre_run_tasks import PreRunTasks
 
@@ -170,6 +171,21 @@ def handler() -> None:
     ) -> None:
         potion_item_roll = PotionItemRoll(pre_run_tasks.potion_json)
         await send_item_roll_message(interaction, potion_item_roll, numero_de_pocoes)
+
+    @bot.tree.command(
+        name="baralho-do-caos",
+        description="Sorteia de 1 a 4 cartas do caos seguindo sua tabela.",
+    )
+    @app_commands.describe(numero_de_cartas="Número de cartas sorteadas, 1 por padrão.")
+    async def roll_chaos_cards(
+        interaction: discord.Interaction, *, numero_de_cartas: int
+    ) -> None:
+        if numero_de_cartas > 4:
+            numero_de_cartas = 4
+        chaos_deck_item_roll = ChaosDeckItemRoll(pre_run_tasks.chaos_deck_json)
+        await send_item_roll_message(
+            interaction, chaos_deck_item_roll, numero_de_cartas
+        )
 
     bot.run(TOKEN)
 
